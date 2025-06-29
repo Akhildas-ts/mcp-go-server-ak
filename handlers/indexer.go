@@ -40,6 +40,12 @@ func IndexRepository(c *gin.Context) {
 	// Index repository
 	result, err := usecase.IndexRepository(indexReq)
 	if err != nil {
+		if result.Status == "empty" {
+			log.Printf("⚠️  Repository is empty or unsupported: %s", result.Repository)
+			errRes := response.ErrorClientResponse(http.StatusUnprocessableEntity, "Repository is empty or contains no supported files for indexing.", err.Error())
+			c.JSON(http.StatusUnprocessableEntity, errRes)
+			return
+		}
 		log.Printf("❌ Indexing failed: %v", err)
 		errRes := response.ErrorClientResponse(http.StatusInternalServerError, "Repository indexing failed", err.Error())
 		c.JSON(http.StatusInternalServerError, errRes)

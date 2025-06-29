@@ -56,6 +56,18 @@ func IndexRepository(indexReq models.IndexRequest) (models.IndexResponse, error)
 		return models.IndexResponse{}, fmt.Errorf("failed to process repository files: %w", err)
 	}
 
+	// If no files were processed, return a special error
+	if fileCount == 0 {
+		log.Printf("⚠️  No files found to process in repository: %s", indexReq.RepoURL)
+		return models.IndexResponse{
+			Repository: helper.ExtractRepoName(indexReq.RepoURL),
+			Branch:     indexReq.Branch,
+			FileCount:  0,
+			ChunkCount: 0,
+			Status:     "empty",
+		}, errors.New("no files found to process in the repository; it may be empty or unsupported")
+	}
+
 	// Extract repository name
 	repoName := helper.ExtractRepoName(indexReq.RepoURL)
 
