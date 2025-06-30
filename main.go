@@ -40,7 +40,7 @@ func main() {
 
 	// Add CORS middleware before other middleware
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://mcp-node-server-ui.replit.app", "http://localhost:3000"},
+		AllowOrigins:     []string{"https://mcp-node-server-ui.replit.app", "http://localhost:3000,https://mcp-go-server.replit.app"},
 		AllowMethods:     []string{"GET", "POST", "HEAD", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
 		AllowCredentials: true,
