@@ -5,7 +5,9 @@ import (
 	"mcp-go-server/config"
 	"mcp-go-server/database"
 	"mcp-go-server/router"
+	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -36,12 +38,27 @@ func main() {
 	// Initialize Gin router
 	r := gin.Default()
 
+	// Add CORS middleware before other middleware
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://mcp-go-server-ui.replit.app", "http://localhost:8081"},
+		AllowMethods:     []string{"GET", "POST", "HEAD", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
+		AllowCredentials: true,
+		ExposeHeaders:    []string{"Content-Length", "Authorization"},
+		MaxAge:           300,
+	}))
+
 	// Setup routes
 	router.MCPRoutes(r.Group("/"), db)
 
-	// Start server
-	log.Printf("MCP Server starting on port %s...", cfg.Port)
-	if err := r.Run(":" + cfg.Port); err != nil {
+	// Use PORT env var if set (for Replit compatibility)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = cfg.Port
+	}
+
+	log.Printf("MCP Server starting on port %s...", port)
+	if err := r.Run("0.0.0.0:" + port); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }
